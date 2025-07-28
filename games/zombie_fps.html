@@ -405,9 +405,9 @@
                     if (touchX >= shootRect.left && touchX <= shootRect.right &&
                         touch.clientY >= shootRect.top && touch.clientY <= shootRect.bottom) {
                         if (shootTouchId === null) {
-                           shootTouchId = touch.identifier;
-                           shoot();
-                           shootButton.style.background = 'rgba(255, 0, 0, 0.4)';
+                            shootTouchId = touch.identifier;
+                            shoot();
+                            shootButton.style.background = 'rgba(255, 0, 0, 0.4)';
                         }
                         continue; // Don't process this touch for anything else
                     }
@@ -485,34 +485,25 @@
 
         // --- GAME LOGIC FUNCTIONS ---
         function createZombie() {
-            // --- FIXED ZOMBIE MODEL ---
             const skinMat = new THREE.MeshStandardMaterial({ color: 0x617d61, roughness: 0.9, metalness: 0.1 });
             const clothesMat = new THREE.MeshStandardMaterial({ color: 0x4a3f35, roughness: 1.0 });
-            
             const zombie = new THREE.Group(); 
             zombie.userData.isZombieRoot = true;
 
-            // Torso
-            const torsoGeo = new THREE.BoxGeometry(1.2, 1.6, 0.6);
-            const torso = new THREE.Mesh(torsoGeo, clothesMat);
+            const torso = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.6, 0.6), clothesMat);
             torso.position.y = 1.6; 
             torso.castShadow = true; 
             zombie.add(torso);
             
-            // Neck
-            const neckGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.4, 8);
-            const neck = new THREE.Mesh(neckGeo, skinMat);
-            neck.position.y = 0.8 + 0.2; // Position on top of torso
+            const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.4, 8), skinMat);
+            neck.position.y = 0.8 + 0.2;
             torso.add(neck);
 
-            // Head
-            const headGeo = new THREE.SphereGeometry(0.5, 16, 12);
-            const head = new THREE.Mesh(headGeo, skinMat);
-            head.position.y = 0.2 + 0.5; // Position on top of neck
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 12), skinMat);
+            head.position.y = 0.2 + 0.5;
             head.castShadow = true; 
             neck.add(head);
 
-            // Eyes
             const eyeMat = new THREE.MeshStandardMaterial({ emissive: 0xff0000, emissiveIntensity: 6, color: 0x000000 });
             const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
             const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
@@ -521,35 +512,30 @@
             eyeR.position.set(-0.2, 0.1, 0.45);
             head.add(eyeL, eyeR);
 
-            // Create a limb function for arms and legs
             const createLimb = (isArm) => {
                 const limbGroup = new THREE.Group();
                 const upperGeo = new THREE.BoxGeometry(0.3, 0.8, 0.3);
                 const lowerGeo = new THREE.BoxGeometry(0.25, 0.8, 0.25);
                 const upperMat = isArm ? skinMat : clothesMat;
-                
                 const upper = new THREE.Mesh(upperGeo, upperMat);
                 const lower = new THREE.Mesh(lowerGeo, skinMat);
-                
                 upper.position.y = -0.4;
                 lower.position.y = -0.8;
-                
                 upper.add(lower);
                 limbGroup.add(upper);
-                
                 limbGroup.castShadow = true;
                 return limbGroup;
             };
 
             const armL = createLimb(true);
             const armR = createLimb(true);
-            armL.position.set(0.75, 0.6, 0); // Position relative to torso center
+            armL.position.set(0.75, 0.6, 0);
             armR.position.set(-0.75, 0.6, 0);
             torso.add(armL, armR);
 
             const legL = createLimb(false);
             const legR = createLimb(false);
-            legL.position.set(0.3, -0.8, 0); // Position relative to torso center
+            legL.position.set(0.3, -0.8, 0);
             legR.position.set(-0.3, -0.8, 0);
             torso.add(legL, legR);
             
@@ -576,7 +562,7 @@
         }
         
         function shoot() {
-            if (ammo <= 0 || blocker.style.display !== 'none') return;
+            if (ammo <= 0 || (isMobile ? blocker.style.display !== 'none' : !controls.isLocked)) return;
             ammo--; gunRecoil = 1;
             muzzleFlash.material.opacity = 1; muzzleLight.visible = true;
             setTimeout(() => { muzzleFlash.material.opacity = 0; muzzleLight.visible = false; }, 60);
@@ -617,7 +603,6 @@
                 gunRecoil = Math.max(0, gunRecoil-delta*5); gun.position.z=-1.5+gunRecoil*0.5; gun.position.y=-0.4-gunRecoil*0.1;
             }
 
-            // --- REVISED BULLET LOGIC ---
             for (let i = bullets.length - 1; i >= 0; i--) {
                 const bullet = bullets[i];
                 const prevPos = bullet.position.clone();
@@ -636,7 +621,6 @@
 
                 raycaster.set(prevPos, bulletTravelVec.normalize());
                 
-                // Check for zombie collision
                 const zombieModels = zombies.filter(z => !z.isDead).map(z => z.model);
                 const zHits = raycaster.intersectObjects(zombieModels, true);
                 if (zHits.length > 0 && zHits[0].distance <= bulletTravelDist) {
@@ -656,7 +640,6 @@
                     continue;
                 }
                 
-                // Check for environment collision
                 const envHits = raycaster.intersectObjects(obstacles, false);
                 if (envHits.length > 0 && envHits[0].distance <= bulletTravelDist) {
                     createImpactEffect(envHits[0].point);
@@ -668,10 +651,9 @@
             const playerPos = cameraHolder.position;
             zombies.forEach(z => {
                 if(z.isDead){ 
-                    // Make zombie fall through the floor
                     if(z.model.rotation.x < Math.PI / 2){
                         z.model.rotation.x += 0.05;
-                        z.model.position.y -= 0.08; // Fall faster
+                        z.model.position.y -= 0.08;
                     } 
                     return;
                 }
@@ -706,6 +688,18 @@
             document.getElementById('final-score').textContent = score;
             document.getElementById('game-over-screen').style.display = 'block';
             blocker.style.display = 'flex'; instructions.style.display = 'none'; crosshair.style.display = 'none';
+            
+            // --- THIS IS THE ADDED SCORE REPORTING LOGIC ---
+            if (window.parent && window.parent.socket && window.parent.getCurrentRoom) {
+                const roomCode = window.parent.getCurrentRoom();
+                if (roomCode) {
+                    window.parent.socket.emit('updateScore', {
+                        roomCode: roomCode,
+                        game: 'zombie_fps',
+                        score: score
+                    });
+                }
+            }
         }
 
         function resetGame() {

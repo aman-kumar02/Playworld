@@ -1,46 +1,99 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- NEW: UI Interaction Logic for Header & Modals ---
+    // --- SOCKET.IO & STATE ---
+    const socket = io();
+    let currentRoom = null;
+    let username = null;
+
+    // Make socket and room info globally accessible for game iframes
+    window.socket = socket;
+    window.getCurrentRoom = () => currentRoom;
+
+    // --- UI ELEMENTS ---
+    const profileModal = document.getElementById('create-profile-modal');
+    const usernameInput = document.getElementById('username-input');
+    const createProfileBtn = document.getElementById('create-profile-btn');
+    const profileUsernameDisplay = document.getElementById('profile-username-display');
+    
     const createRoomBtn = document.getElementById('create-room-btn');
     const joinRoomBtn = document.getElementById('join-room-btn');
     const createRoomModal = document.getElementById('create-room-modal');
     const joinRoomModal = document.getElementById('join-room-modal');
+    const roomCodeDisplay = createRoomModal.querySelector('.room-code-display');
+    const joinRoomInput = joinRoomModal.querySelector('#join-room-input');
+    const joinRoomSubmitBtn = joinRoomModal.querySelector('#join-room-submit-btn');
+
+    const leaderboardScores = document.querySelector('.leaderboard-scores');
+    const gameSelect = document.getElementById('game-select');
     const userIconBtn = document.getElementById('user-icon-btn');
     const userDropdown = document.getElementById('user-dropdown');
-    
-    // Function to open a modal
-    const openModal = (modal) => {
-        if (modal) modal.style.display = 'flex';
-    };
-    // Function to close all modals
-    const closeModal = () => {
-        if (createRoomModal) createRoomModal.style.display = 'none';
-        if (joinRoomModal) joinRoomModal.style.display = 'none';
-    };
 
-    // Event listeners for modal buttons
-    if (createRoomBtn) createRoomBtn.addEventListener('click', () => openModal(createRoomModal));
-    if (joinRoomBtn) joinRoomBtn.addEventListener('click', () => openModal(joinRoomModal));
-
-    // Add event listeners to all close buttons
-    document.querySelectorAll('.modal-close-btn').forEach(btn => {
-        btn.addEventListener('click', closeModal);
+    // --- PROFILE CREATION ---
+    createProfileBtn.addEventListener('click', () => {
+        const name = usernameInput.value.trim();
+        if (name) {
+            username = name;
+            socket.emit('createProfile', username);
+            profileUsernameDisplay.textContent = username;
+            profileModal.style.display = 'none';
+        } else {
+            alert('Please enter a username.');
+        }
     });
 
-    // Event listener for user profile dropdown
+    // --- EVENT EMITTERS (Client -> Server) ---
+    createRoomBtn.addEventListener('click', () => socket.emit('createRoom'));
+    joinRoomBtn.addEventListener('click', () => openModal(joinRoomModal));
+    joinRoomSubmitBtn.addEventListener('click', () => {
+        const roomCode = joinRoomInput.value.trim().toUpperCase();
+        if (roomCode) socket.emit('joinRoom', roomCode);
+    });
+
+    // --- EVENT LISTENERS (Server -> Client) ---
+    socket.on('roomCreated', (roomCode) => {
+        currentRoom = roomCode;
+        roomCodeDisplay.textContent = roomCode;
+        openModal(createRoomModal);
+        updateLeaderboard({ game: gameSelect.value, scores: { [username]: 0 } });
+    });
+    socket.on('joinedRoom', (roomCode) => {
+        currentRoom = roomCode;
+        closeModal();
+        alert(`Successfully joined room: ${roomCode}`);
+    });
+    socket.on('updateLeaderboard', (data) => updateLeaderboard(data));
+    socket.on('error', (message) => alert(`Error: ${message}`));
+    
+    function updateLeaderboard({ game, scores }) {
+        if (game === gameSelect.value) {
+            leaderboardScores.innerHTML = '';
+            // Sort scores in descending order before displaying
+            const sortedScores = Object.entries(scores).sort(([, a], [, b]) => b - a);
+            for (const [playerName, score] of sortedScores) {
+                const entry = document.createElement('div');
+                entry.className = 'score-entry';
+                const displayName = playerName === username ? `${playerName} (You)` : playerName;
+                entry.innerHTML = `<span class="player-name">${displayName}</span><span class="player-score">${score}</span>`;
+                leaderboardScores.appendChild(entry);
+            }
+        }
+    }
+
+    // --- LOCAL UI HELPERS ---
+    const openModal = (modal) => modal.style.display = 'flex';
+    const closeModal = () => { createRoomModal.style.display = 'none'; joinRoomModal.style.display = 'none'; };
+    document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', closeModal));
+    
     if (userIconBtn) {
         userIconBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevents the window click from closing it immediately
+            e.stopPropagation();
             userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
         });
     }
-    
-    // Close dropdown if clicking outside
     window.addEventListener('click', () => {
         if (userDropdown && userDropdown.style.display === 'block') {
             userDropdown.style.display = 'none';
         }
     });
-
 
     // --- DRAMATIC Multi-Layer Neural Network Animation ---
     const canvas = document.getElementById('neural-background');

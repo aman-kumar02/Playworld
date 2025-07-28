@@ -8,7 +8,17 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- NEW: Site Header with Multiplayer UI -->
+    <!-- NEW: Create Profile Modal (will be visible on page load) -->
+    <div id="create-profile-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Welcome to AI Playworld!</h2>
+            <p>Please create a username to continue.</p>
+            <input type="text" id="username-input" class="room-code-input" placeholder="Enter your username">
+            <button id="create-profile-btn" class="header-button" style="margin-top: 10px;">Create Profile</button>
+        </div>
+    </div>
+
+    <!-- Site Header with Multiplayer UI -->
     <header class="site-header">
         <div class="header-content">
             <img src="images/logo.png" alt="AI Playworld Logo" class="header-logo">
@@ -25,7 +35,8 @@
                     </svg>
                 </button>
                 <div id="user-dropdown" class="user-dropdown">
-                    <a href="#">Profile</a>
+                    <!-- Username will be inserted here -->
+                    <a href="#" id="profile-username-display">Profile</a>
                     <a href="#">Settings</a>
                     <a href="#">Logout</a>
                 </div>
@@ -33,12 +44,12 @@
         </nav>
     </header>
 
-    <!-- NEW: Modals for Create/Join Room (hidden by default) -->
+    <!-- Modals for Create/Join Room -->
     <div id="create-room-modal" class="modal-overlay">
         <div class="modal-content">
             <h2>Create a Room</h2>
             <p>Your new room code is:</p>
-            <div class="room-code-display">ABCDE1</div>
+            <div class="room-code-display"></div>
             <p>Share this code with your friends!</p>
             <button class="modal-close-btn">Close</button>
         </div>
@@ -47,13 +58,13 @@
         <div class="modal-content">
             <h2>Join a Room</h2>
             <p>Enter the room code below:</p>
-            <input type="text" class="room-code-input" placeholder="e.g., ABCDE1">
-            <button class="header-button" style="margin-top: 10px;">Join</button>
+            <input type="text" id="join-room-input" class="room-code-input" placeholder="e.g., ABCDE1">
+            <button id="join-room-submit-btn" class="header-button" style="margin-top: 10px;">Join</button>
             <button class="modal-close-btn">Close</button>
         </div>
     </div>
 
-    <!-- Sticky Hero Section -->
+    <!-- Sticky Hero Section (unchanged) -->
     <div id="hero-container">
         <div id="hero-sticky-content">
             <canvas id="neural-background"></canvas>
@@ -66,7 +77,7 @@
 
     <!-- Main Content Area -->
     <main class="main-content">
-        <!-- NEW: Room Leaderboard Section -->
+        <!-- Room Leaderboard Section -->
         <section id="leaderboard-section" class="leaderboard-container">
             <div class="leaderboard-header">
                 <h2>Room Leaderboard</h2>
@@ -81,14 +92,11 @@
                     </select>
                 </div>
             </div>
-            <div class="leaderboard-scores">
-                <div class="score-entry"><span class="player-name">Player1 (You)</span><span class="player-score">15</span></div>
-                <div class="score-entry"><span class="player-name">Friend_A</span><span class="player-score">12</span></div>
-                <div class="score-entry"><span class="player-name">ProGamer99</span><span class="player-score">9</span></div>
-            </div>
+            <!-- Scores will be filled by JS. -->
+            <div class="leaderboard-scores"></div>
         </section>
 
-        <!-- Carousel Section -->
+        <!-- Carousel Section (unchanged) -->
         <div class="carousel-container">
             <div class="carousel-slider">
                 <a href="games/stack_game.html" class="slide"><img src="images/stack_game_preview.png" alt="Stacks Game"><div class="slide-title">Stacks</div></a>
@@ -101,7 +109,7 @@
             <button class="carousel-button next">&#10095;</button>
         </div>
         
-        <!-- Game Grid and Search Section -->
+        <!-- Game Grid and Search Section (unchanged) -->
         <div class="game-grid-container">
             <input type="text" id="game-search-input" placeholder="Search for a game...">
             <div class="game-grid">
@@ -118,6 +126,8 @@
         <p>&copy; 2025 AI Playworld. All games are created for demonstration purposes.</p>
     </footer>
 
+    <!-- Scripts for backend communication -->
+    <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

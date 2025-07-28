@@ -82,7 +82,6 @@ function flap() {
     }
 }
 
-
 function updatePipes() {
     for (let i = pipes.length - 1; i >= 0; i--) {
         pipes[i].x -= speed;
@@ -164,6 +163,18 @@ function endGame() {
     if (!gameOver) {
       gameOver = true;
       lastGameOverTime = new Date().getTime();
+
+      // --- SCORE REPORTING LOGIC ---
+      if (window.parent && window.parent.socket && window.parent.getCurrentRoom) {
+          const roomCode = window.parent.getCurrentRoom();
+          if (roomCode) {
+              window.parent.socket.emit('updateScore', {
+                  roomCode: roomCode,
+                  game: 'flappy_bird',
+                  score: score
+              });
+          }
+      }
     }
 }
 
@@ -179,4 +190,3 @@ function gameLoop() {
 // Start game
 let pipeInterval = setInterval(spawnPipe, 1800);
 gameLoop();
-

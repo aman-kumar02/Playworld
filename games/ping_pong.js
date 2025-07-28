@@ -85,6 +85,18 @@ function update() {
     // Check for winner
     if (player.score === winningScore || ai.score === winningScore) {
         gameOver = true;
+        
+        // --- SCORE REPORTING LOGIC ---
+        if (window.parent && window.parent.socket && window.parent.getCurrentRoom) {
+            const roomCode = window.parent.getCurrentRoom();
+            if (roomCode) {
+                window.parent.socket.emit('updateScore', {
+                    roomCode: roomCode,
+                    game: 'ping_pong', // Matches the value in the dropdown
+                    score: player.score // Report the player's score
+                });
+            }
+        }
     }
 }
 
