@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Playworld</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- NEW: Site Header with Multiplayer UI -->
+    <header class="site-header">
+        <div class="header-content">
+            <img src="images/logo.png" alt="AI Playworld Logo" class="header-logo">
+            <span class="header-title">AI Playworld</span>
+        </div>
+        <nav class="header-nav">
+            <button id="join-room-btn" class="header-button">Join Room</button>
+            <button id="create-room-btn" class="header-button">Create Room</button>
+            <div id="user-profile-menu" class="user-profile-menu">
+                <button id="user-icon-btn" class="user-icon-btn">
+                    <!-- Simple User SVG Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </button>
+                <div id="user-dropdown" class="user-dropdown">
+                    <a href="#">Profile</a>
+                    <a href="#">Settings</a>
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- NEW: Modals for Create/Join Room (hidden by default) -->
+    <div id="create-room-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Create a Room</h2>
+            <p>Your new room code is:</p>
+            <div class="room-code-display">ABCDE1</div>
+            <p>Share this code with your friends!</p>
+            <button class="modal-close-btn">Close</button>
+        </div>
+    </div>
+    <div id="join-room-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Join a Room</h2>
+            <p>Enter the room code below:</p>
+            <input type="text" class="room-code-input" placeholder="e.g., ABCDE1">
+            <button class="header-button" style="margin-top: 10px;">Join</button>
+            <button class="modal-close-btn">Close</button>
+        </div>
+    </div>
+
+    <!-- Sticky Hero Section -->
+    <div id="hero-container">
+        <div id="hero-sticky-content">
+            <canvas id="neural-background"></canvas>
+            <h1 id="hero-title">AI Playworld</h1>
+            <p id="hero-intro">
+                Dive into a world of pixels and play! This is a digital playground where code comes to life. Each game here is a small project born from curiosity and a love for classic arcade fun. Scroll down to explore.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- NEW: Room Leaderboard Section -->
+        <section id="leaderboard-section" class="leaderboard-container">
+            <div class="leaderboard-header">
+                <h2>Room Leaderboard</h2>
+                <div class="game-select-wrapper">
+                    <label for="game-select">Game:</label>
+                    <select id="game-select">
+                        <option value="stacks">3D Stacks</option>
+                        <option value="zombie_fps">Zombie Survival</option>
+                        <option value="car_game">Lane Dodger</option>
+                        <option value="flappy_bird">Flappy Pipe</option>
+                        <option value="ping_pong">Classic Pong</option>
+                    </select>
+                </div>
+            </div>
+            <div class="leaderboard-scores">
+                <div class="score-entry"><span class="player-name">Player1 (You)</span><span class="player-score">15</span></div>
+                <div class="score-entry"><span class="player-name">Friend_A</span><span class="player-score">12</span></div>
+                <div class="score-entry"><span class="player-name">ProGamer99</span><span class="player-score">9</span></div>
+            </div>
+        </section>
+
+        <!-- Carousel Section -->
+        <div class="carousel-container">
+            <div class="carousel-slider">
+                <a href="games/stack_game.html" class="slide"><img src="images/stack_game_preview.png" alt="Stacks Game"><div class="slide-title">Stacks</div></a>
+                <a href="games/zombie_fps.html" class="slide"><img src="images/zombie_game_preview.png" alt="Zombie FPS Game"><div class="slide-title">Zombie Survival</div></a>
+                <a href="games/car_game.html" class="slide"><img src="images/car_game_preview.png" alt="Car Lane Game"><div class="slide-title">Lane Dodger</div></a>
+                <a href="games/ping_pong.html" class="slide"><img src="images/ping_pong_preview.png" alt="Ping Pong Game"><div class="slide-title">Classic Pong</div></a>
+                <a href="games/flappy_bird.html" class="slide"><img src="images/flappy_bird_preview.png" alt="Flappy Bird Game"><div class="slide-title">Flappy Pipe</div></a>
+            </div>
+            <button class="carousel-button prev">&#10094;</button>
+            <button class="carousel-button next">&#10095;</button>
+        </div>
+        
+        <!-- Game Grid and Search Section -->
+        <div class="game-grid-container">
+            <input type="text" id="game-search-input" placeholder="Search for a game...">
+            <div class="game-grid">
+                <a href="games/stack_game.html" class="game-tile" data-name="Stacks Block Game"><img src="images/stack_game_preview.png" alt="Stacks Game"><div class="tile-info"><h3>Stacks</h3><p>Test your timing and precision by stacking blocks.</p></div></a>
+                <a href="games/zombie_fps.html" class="game-tile" data-name="Zombie Survival FPS Shooter"><img src="images/zombie_game_preview.png" alt="Zombie FPS Game"><div class="tile-info"><h3>Zombie Survival</h3><p>A 3D first-person shooter. Survive the waves!</p></div></a>
+                <a href="games/car_game.html" class="game-tile" data-name="Lane Dodger Car Game"><img src="images/car_game_preview.png" alt="Car Lane Game"><div class="tile-info"><h3>Lane Dodger</h3><p>Dodge traffic in this fast-paced arcade racer.</p></div></a>
+                <a href="games/ping_pong.html" class="game-tile" data-name="Classic Pong Ping Pong"><img src="images/ping_pong_preview.png" alt="Ping Pong Game"><div class="tile-info"><h3>Classic Pong</h3><p>A timeless paddle and ball game against an AI opponent.</p></div></a>
+                <a href="games/flappy_bird.html" class="game-tile" data-name="Flappy Pipe Bird"><img src="images/flappy_bird_preview.png" alt="Flappy Bird Game"><div class="tile-info"><h3>Flappy Pipe</h3><p>Navigate the bird through an endless maze of pipes.</p></div></a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 AI Playworld. All games are created for demonstration purposes.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

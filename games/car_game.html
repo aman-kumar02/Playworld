@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Lane Dodger</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* This ensures the game container centers its content */
+        .game-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* This will center the canvas container */
+        }
+        #game-over-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+        }
+        #score-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.5rem;
+            color: #fff;
+            text-shadow: 2px 2px 4px #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- This container holds the 3D canvas -->
+        <div id="game-canvas-container">
+             <!-- The canvas will be added here by JavaScript -->
+            <div id="score-display">Score: 0</div>
+            <div id="game-over-overlay">
+                <div>Game Over</div>
+                <div id="final-score">Score: 0</div>
+                <button id="play-again-button" class="back-link" style="margin-top: 20px;">Play Again</button>
+            </div>
+        </div>
+
+        <p class="instructions">Use 'A' and 'D' to switch lanes. Avoid the other cars!</p>
+        <!-- The Back to Playworld button is now outside the canvas container -->
+        <a href="../index.html" class="back-link">Back to Playworld</a>
+    </div>
+
+    <!-- Add Three.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="car_game.js"></script>
+</body>
+</html>
